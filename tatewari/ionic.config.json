@@ -1,0 +1,7 @@
+{
+  "name": "Tatewari",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
