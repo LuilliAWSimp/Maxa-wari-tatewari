@@ -17,6 +17,7 @@
     <ion-row>
       <ion-col *ngFor="let item of resp">
         <ion-card>
+<<<<<<< Updated upstream
           <ion-card-header>
             <ion-card-title>{{ item.id_user }}</ion-card-title>
             <ion-button (click)="item.id_user !== undefined && eliminarDato(item.id_user)" shape="round-10" fill="clear"> <ion-icon slot="icon-only"  name="trash-outline"></ion-icon></ion-button>
@@ -26,6 +27,18 @@
             <p>Id usuario {{ item.id_user }}</p>
             <p>Nombre {{ item.name }}</p>
             <p>Email {{ item.email }}</p>            
+=======
+
+          <ion-card-header>
+            <ion-card-title>{{ item.id }}</ion-card-title>
+            <ion-button (click)="item.id !== undefined && eliminarDato(item.id)" shape="round-10" fill="clear"> <ion-icon slot="icon-only"  name="trash-outline"></ion-icon></ion-button>
+          </ion-card-header>
+
+          <ion-card-content>
+            <p>Titulo: {{ item.titulo }}</p>
+            <p>Cuerpo: {{ item.cuerpo }}</p>
+            <p>Fecha: {{ item.fecha }}</p>
+>>>>>>> Stashed changes
           </ion-card-content>
         </ion-card>
       </ion-col>
