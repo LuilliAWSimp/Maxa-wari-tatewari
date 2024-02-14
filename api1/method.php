@@ -1,4 +1,15 @@
 <?php
+// Permitir solicitudes desde cualquier origen
+header("Access-Control-Allow-Origin: *");
+
+// Permitir los métodos HTTP específicos que quieres admitir
+header("Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE");
+
+// Permitir los encabezados HTTP específicos que quieres admitir
+header("Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization");
+
+// Establecer el tipo de contenido de la respuesta como JSON
+header('Content-Type: application/json');
 require "config/Conexion.php";
 $datos = json_decode(file_get_contents('php://input'), true);
 

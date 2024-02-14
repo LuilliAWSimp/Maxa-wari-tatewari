@@ -5,13 +5,14 @@ import { TopLevel } from '../../interfaces/index';
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss']
+  styleUrls: ['tab1.page.scss'],
+  providers: [ApiService], // Añade el ApiService como provider aquí
 })
-
 export class Tab1Page implements OnInit {
   public resp: TopLevel[] = [];
 
   constructor(private newService: ApiService) {}
+
   ngOnInit() {
     this.newService.getTopHeadlines().subscribe((resp) => {
       console.log(resp); // Imprime el objeto TopLevel o arreglo TopLevel en la consola
@@ -22,15 +23,16 @@ export class Tab1Page implements OnInit {
       }
     });
   }
+
   eliminarDato(id_user: number) {
     this.newService.eliminarDato(id_user).subscribe(
       () => {
-        console.log('Usuario eliminado con exito');
+        console.log('Usuario eliminado con éxito');
         // Filtrar la lista actual para quitar el elemento eliminado
-        this.resp = this.resp.filter(item => item.id_user != id_user);
+        this.resp = this.resp.filter((item) => item.id_user != id_user);
       },
       (error) => {
-        console.error('Error al eliminar el producto:', error);
+        console.error('Error al eliminar el usuario:', error);
       }
     );
   }
