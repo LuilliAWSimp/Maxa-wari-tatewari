@@ -15,9 +15,9 @@
   <table>
     <thead>
       <tr>
-        <th>Titulo</th>
-        <th>Contenido</th>
-        <th>Creado En</th>
+        <th>id_user</th>
+        <th>name</th>
+        <th>email</th>
       </tr>
     </thead>
     <tbody id="tabla-body">
@@ -27,16 +27,17 @@
 
   <script>
     // Realizar la solicitud GET a la API en PHP
-    fetch('method.php')
+    fetch('rikki.php')
       .then(response => response.json())
       .then(data => {
         const tablaBody = document.getElementById('tabla-body');
         data.forEach(item => {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${item.titulo}</td>
-            <td>${item.contenido}</td>
-            <td>${item.creado_en}</td>
+            <td>${item.id_user}</td>
+            <td>${item.name}</td>
+            <td>${item.email}</td>
+            <td>${item.password}</td>
           `;
           tablaBody.appendChild(row);
         });
@@ -46,14 +47,15 @@
 
   <h1>API de Ejemplo (POST)</h1>
   <form id="miFormulario1">
-    <label for="id_usuario">ID de Usuario:</label>
-    <input type="text" id="id_usuario" name="id_usuario" required><br><br>
 
-    <label for="titulo">Titulo:</label>
-    <input type="text" id="titulo" name="titulo" required><br><br>
+    <label for="name">name:</label>
+    <input type="text" id="name" name="name" required><br><br>
 
-    <label for="contenido">Contenido:</label>
-    <input type="text" id="contenido" name="contenido" required><br><br>
+    <label for="email">email:</label>
+    <input type="text" id="email" name="email" required><br><br>
+
+    <label for="password">password:</label>
+    <input type="text" id="password" name="password" required><br><br>
 
     <input type="submit" value="Enviar">
   </form>
