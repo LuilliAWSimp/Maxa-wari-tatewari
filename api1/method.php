@@ -2,11 +2,44 @@
 require "config/Conexion.php";
 $datos = json_decode(file_get_contents('php://input'), true);
 
-
-//users//
+// users //
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        $sql = "SELECT id_user, name, email, password FROM usuarios";
+    // Verificar si se proporcionó el parámetro 'id_user'
+    if (isset($_GET['id_user'])) {
+        // Obtener el ID de usuario de la solicitud GET
+        $id_user = $_GET['id_user'];
+
+        // Construir la consulta SQL para obtener el usuario por su ID
+        $sql = "SELECT id_user, name, email, password FROM usuario WHERE id_user = $id_user";
+
+        // Ejecutar la consulta SQL
+        $result = $conexion->query($sql);
+
+        // Verificar si se encontraron resultados
+        if ($result->num_rows > 0) {
+            // Crear un array para almacenar los datos del usuario
+            $data = array();
+            
+            // Recorrer los resultados y almacenarlos en el array
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+            
+            // Establecer el tipo de contenido de la respuesta como JSON
+            header('Content-Type: application/json');
+            
+            // Devolver los datos del usuario como JSON
+            echo json_encode($data);
+        } else {
+            // Si no se encontraron resultados para el ID de usuario proporcionado
+            echo "No se encontró ningún usuario con el ID proporcionado.";
+        }
+        // Salir del switch después de manejar la solicitud GET
+        exit();
+    } else {
+        // Si no se proporcionó el parámetro 'id_user', realizar una consulta general
+        $sql = "SELECT id_user, name, email, password FROM usuario";
         $query = $conexion->query($sql);
 
         if ($query->num_rows > 0) {
@@ -17,53 +50,58 @@ switch ($_SERVER['REQUEST_METHOD']) {
             header('Content-Type: application/json');
             echo json_encode($data);
         } else {
-            echo "No se encontraron registros en la tabla de usuarios.";
+            echo "No se encontraron registros en la tabla de usuario";
         }
-
-        $conexion->close();
-        break;
-
-    case 'POST':
-        $name = $datos['name'];
-        $email = $datos['email'];
-        $password = $datos['password'];
-
-        $sql = $conexion->prepare("INSERT INTO usuarios (name, email, password) VALUES (?,?,?)");
-        $sql->bind_param("sss", $name, $email, $password);
-
-        if ($sql->execute()) {
-            echo "Datos insertados con éxito";
-        } else {
-            echo "Error al insertar datos: " . $sql->error;
-        }
-
-        $sql->close();
-        break;
+    }
+    break;
 
     case 'PATCH':
-        $id_user = $datos['id_user'];
-        $name = $datos['name'];
-        $email = $datos['email'];
-        $password = $datos['password'];
+        // Obtener los datos de la solicitud PATCH
+        parse_str(file_get_contents("php://input"), $datos);
 
-        $actualizaciones = array();
-        if (!empty($name)) {
-            $actualizaciones[] = "name = '$name'";
-        }
-        if (!empty($email)) {
-            $actualizaciones[] = "email = '$email'";
-        }
-        if (!empty($password)) {
-            $actualizaciones[] = "password = '$password'";
-        }
+        // Verificar si se proporcionó el id_user y al menos un campo para actualizar
+        if (isset($datos['id_user']) && (isset($datos['name']) || isset($datos['email']) || isset($datos['password']))) {
+            // Obtener el id_user y los campos para actualizar
+            $id_user = $datos['id_user'];
+            $name = isset($datos['name']) ? $datos['name'] : null;
+            $email = isset($datos['email']) ? $datos['email'] : null;
+            $password = isset($datos['password']) ? $datos['password'] : null;
 
-        $actualizaciones_str = implode(', ', $actualizaciones);
-        $sql = "UPDATE usuarios SET $actualizaciones_str WHERE id_user = $id_user";
+            // Inicializar array de actualizaciones
+            $actualizaciones = array();
 
-        if ($conexion->query($sql) === TRUE) {
-            echo "Registro actualizado con éxito.";
+            // Verificar y agregar los campos a actualizar
+            if ($name !== null) {
+                $actualizaciones[] = "name = '$name'";
+            }
+            if ($email !== null) {
+                $actualizaciones[] = "email = '$email'";
+            }
+            if ($password !== null) {
+                $actualizaciones[] = "password = '$password'";
+            }
+
+            // Verificar si se proporcionaron campos para actualizar
+            if (!empty($actualizaciones)) {
+                // Construir la cadena de actualizaciones
+                $actualizaciones_str = implode(', ', $actualizaciones);
+
+                // Construir la consulta SQL
+                $sql = "UPDATE usuario SET $actualizaciones_str WHERE id_user = $id_user";
+
+                // Ejecutar la consulta SQL
+                if ($conexion->query($sql) === TRUE) {
+                    echo "Registro actualizado con éxito.";
+                } else {
+                    echo "Error al actualizar registro: " . $conexion->error;
+                }
+            } else {
+                // Si no se proporcionaron campos para actualizar
+                echo "No se proporcionaron campos válidos para actualizar.";
+            }
         } else {
-            echo "Error al actualizar registro: " . $conexion->error;
+            // Si no se proporcionó el id_user o no se proporcionaron campos para actualizar
+            echo "Faltan parámetros en la solicitud PATCH.";
         }
         break;
 
@@ -73,7 +111,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         $email = $datos['email'];
         $password = $datos['password'];
 
-        $sql = "UPDATE usuarios SET name = '$name', email = '$email', password = '$password' WHERE id_user = $id_user";
+        $sql = "UPDATE usuario SET name = '$name', email = '$email', password = '$password' WHERE id_user = $id_user";
 
         if ($conexion->query($sql) === TRUE) {
             echo "Registro actualizado con éxito.";
@@ -83,50 +121,59 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'DELETE':
-        $id_user = $datos['id_user'];
+    // Obtener el ID de usuario del arreglo $datos
+    $id_user = isset($_GET['id_user']) ? $_GET['id_user'] : null;
 
-        $stmt = $conexion->prepare("DELETE FROM usuarios WHERE id_user = ?");
-        $stmt->bind_param("i", $id_user);
+    // Verificar si se proporcionó el ID de usuario
+    if ($id_user === null) {
+        echo "ID de usuario no proporcionado.";
+        break; // Sale del switch si el ID de usuario no está presente
+    }
 
-        if ($stmt->execute()) {
-            echo "Registro eliminado con éxito.";
-        } else {
-            echo "Error al eliminar registro: " . $stmt->error;
-        }
+    // Preparar la consulta de eliminación
+    $stmt = $conexion->prepare("DELETE FROM usuario WHERE id_user = ?");
 
-        $stmt->close();
+    // Verificar si la preparación de la consulta fue exitosa
+    if ($stmt === false) {
+        echo "Error en la preparación de la consulta: " . $conexion->error;
         break;
+    }
 
-    default:
-        echo "Método de solicitud no válido.";
-        break;
+    // Vincular el parámetro ID de usuario
+    $stmt->bind_param("i", $id_user);
+
+    // Ejecutar la consulta de eliminación
+    if ($stmt->execute()) {
+        echo "Registro eliminado con éxito.";
+    } else {
+        echo "Error al eliminar registro: " . $stmt->error;
+    }
+    break;
 }
 
 //diario//
-
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        $sql = "SELECT id_regis, id_habit, id_user, date, archievement FROM diario";
-        $query = $conexion->query($sql);
-
-        if ($query->num_rows > 0) {
-            $data = array();
-            while ($row = $query->fetch_assoc()) {
-                $data[] = $row;
-            }
-            header('Content-Type: application/json');
-            echo json_encode($data);
-        } else {
-            echo "No se encontraron registros en la tabla de diario.";
+    $sql = "SELECT id_regis, id_habit, id_user, date, archievement FROM diario";
+    $query = $conexion->query($sql);
+    
+    if ($query->num_rows > 0) {
+        $data = array();
+        while ($row = $query->fetch_assoc()) {
+            $data[] = $row;
         }
-
-        $conexion->close();
-        break;
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    } else {
+        echo "No se encontraron registros en la tabla de diario.";
+    }
+    exit(); // Detener la ejecución del script después de mostrar el resultado
+    break;
 
     case 'POST':
-        $id_habit = $datos['id_habit'];
-        $id_user = $datos['id_user'];
-        $date = $datos['date'];
+        $id_habit = $_POST['id_habit'];
+        $id_user = $_POST['id_user'];
+        $date = $_POST['date'];
         $archievement = $datos['archievement'];
 
         $sql = $conexion->prepare("INSERT INTO diario (id_habit, id_user, date, archievement) VALUES (?,?,?,?)");
@@ -137,78 +184,31 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "Error al insertar datos: " . $sql->error;
         }
-
-        $sql->close();
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'PATCH':
-        $id_regis = $datos['id_regis'];
-        $id_habit = $datos['id_habit'];
-        $id_user = $datos['id_user'];
-        $date = $datos['date'];
-        $archievement = $datos['archievement'];
-
-        $actualizaciones = array();
-        if (!empty($id_habit)) {
-            $actualizaciones[] = "id_habit = '$id_habit'";
-        }
-        if (!empty($id_user)) {
-            $actualizaciones[] = "id_user = '$id_user'";
-        }
-        if (!empty($date)) {
-            $actualizaciones[] = "date = '$date'";
-        }
-        if (!empty($archievement)) {
-            $actualizaciones[] = "archievement = '$archievement'";
-        }
-
-        $actualizaciones_str = implode(', ', $actualizaciones);
-        $sql = "UPDATE diario SET $actualizaciones_str WHERE id_regis = $id_regis";
-
-        if ($conexion->query($sql) === TRUE) {
-            echo "Registro actualizado con éxito.";
-        } else {
-            echo "Error al actualizar registro: " . $conexion->error;
-        }
+        // Código para el caso PATCH...
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'PUT':
-        $id_regis = $datos['id_regis'];
-        $id_habit = $datos['id_habit'];
-        $id_user = $datos['id_user'];
-        $date = $datos['date'];
-        $archievement = $datos['archievement'];
-
-        $sql = "UPDATE diario SET id_habit = '$id_habit', id_user = '$id_user', date = '$date', archievement = '$archievement' WHERE id_regis = $id_regis";
-
-        if ($conexion->query($sql) === TRUE) {
-            echo "Registro actualizado con éxito.";
-        } else {
-            echo "Error al actualizar registro: " . $conexion->error;
-        }
+        // Código para el caso PUT...
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'DELETE':
-        $id_regis = $datos['id_regis'];
-
-        $stmt = $conexion->prepare("DELETE FROM diario WHERE id_regis = ?");
-        $stmt->bind_param("i", $id_regis);
-
-        if ($stmt->execute()) {
-            echo "Registro eliminado con éxito.";
-        } else {
-            echo "Error al eliminar registro: " . $stmt->error;
-        }
-
-        $stmt->close();
+        // Código para el caso DELETE...
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     default:
         echo "Método de solicitud no válido.";
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 }
 
-//habits//
+// habits //
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         $sql = "SELECT id_habit, id_user, nombre, tipo, descripcion FROM habits";
@@ -224,8 +224,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "No se encontraron registros en la tabla de habits.";
         }
-
-        $conexion->close();
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'POST':
@@ -242,8 +241,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "Error al insertar datos: " . $sql->error;
         }
-
-        $sql->close();
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'PATCH':
@@ -275,6 +273,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "Error al actualizar registro: " . $conexion->error;
         }
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'PUT':
@@ -291,6 +290,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "Error al actualizar registro: " . $conexion->error;
         }
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'DELETE':
@@ -304,17 +304,16 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "Error al eliminar registro: " . $stmt->error;
         }
-
-        $stmt->close();
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     default:
         echo "Método de solicitud no válido.";
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 }
 
-//stats//
-
+// stats //
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         $sql = "SELECT id_stat, id_user, date, stat FROM stats";
@@ -330,8 +329,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "No se encontraron registros en la tabla de stats.";
         }
-
-        $conexion->close();
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'POST':
@@ -347,8 +345,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "Error al insertar datos: " . $sql->error;
         }
-
-        $sql->close();
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'PATCH':
@@ -376,6 +373,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "Error al actualizar registro: " . $conexion->error;
         }
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'PUT':
@@ -391,6 +389,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "Error al actualizar registro: " . $conexion->error;
         }
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     case 'DELETE':
@@ -404,12 +403,12 @@ switch ($_SERVER['REQUEST_METHOD']) {
         } else {
             echo "Error al eliminar registro: " . $stmt->error;
         }
-
-        $stmt->close();
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 
     default:
         echo "Método de solicitud no válido.";
+        exit(); // Detener la ejecución del script después de mostrar el resultado
         break;
 }
 
