@@ -55,6 +55,38 @@ switch ($_SERVER['REQUEST_METHOD']) {
     }
     break;
 
+    case 'POST':
+        // Verificar si se proporcionaron todos los datos necesarios
+        if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])) {
+            // Obtener los datos del formulario
+            $name = $_POST['name'];
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+    
+            // Preparar la consulta SQL para insertar un nuevo usuario
+            $stmt = $conexion->prepare("INSERT INTO usuario (name, email, password) VALUES (?, ?, ?)");
+    
+            // Verificar si la preparación de la consulta fue exitosa
+            if ($stmt === false) {
+                echo "Error en la preparación de la consulta: " . $conexion->error;
+                break;
+            }
+    
+            // Vincular los parámetros
+            $stmt->bind_param("sss", $name, $email, $password);
+    
+            // Ejecutar la consulta
+            if ($stmt->execute()) {
+                echo "Usuario insertado con éxito.";
+            } else {
+                echo "Error al insertar usuario: " . $stmt->error;
+            }
+        } else {
+            // Si falta algún dato necesario en el formulario
+            echo "Faltan datos en el formulario.";
+        }
+        break;
+
     case 'PATCH':
         // Obtener los datos de la solicitud PATCH
         parse_str(file_get_contents("php://input"), $datos);
@@ -154,7 +186,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 //diario//
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-    $sql = "SELECT id_regis, id_habit, id_user, date, archievement FROM diario";
+    $sql = "SELECT id_regis, id_habit, id_user, date, achievement FROM diario";
     $query = $conexion->query($sql);
     
     if ($query->num_rows > 0) {
@@ -174,10 +206,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
         $id_habit = $_POST['id_habit'];
         $id_user = $_POST['id_user'];
         $date = $_POST['date'];
-        $archievement = $datos['archievement'];
+        $achievement = $datos['achievement'];
 
-        $sql = $conexion->prepare("INSERT INTO diario (id_habit, id_user, date, archievement) VALUES (?,?,?,?)");
-        $sql->bind_param("iiss", $id_habit, $id_user, $date, $archievement);
+        $sql = $conexion->prepare("INSERT INTO diario (id_habit, id_user, date, achievement) VALUES (?,?,?,?)");
+        $sql->bind_param("iiss", $id_habit, $id_user, $date, $achievement);
 
         if ($sql->execute()) {
             echo "Datos insertados con éxito";
