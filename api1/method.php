@@ -1,12 +1,22 @@
 <?php
-require "config/Conexion.php";
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, DELETE");
 header("Access-Control-Allow-Headers:Content-Type");
+require "config/Conexion.php";
 $datos = json_decode(file_get_contents('php://input'), true);
 
 // users //
 switch ($_SERVER['REQUEST_METHOD']) {
+   header("Access-Control-Allow-Origin: *");
+   
+   // Permitir métodos HTTP específicos
+   header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE, HEAD, TRACE, PATCH");
+   
+   // Permitir encabezados personalizados
+   header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+   
+   // Permitir credenciales
+   header("Access-Control-Allow-Credentials: true");
     case 'GET':
     // Verificar si se proporcionó el parámetro 'id_user'
     if (isset($_GET['id_user'])) {

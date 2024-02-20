@@ -74,7 +74,7 @@
 
       const formData = new FormData(formulario1);
 
-      fetch('method.php', {
+      fetch('rikki.php', {
         method: 'POST',
         body: formData
       })
@@ -106,7 +106,7 @@
           };
           return $.ajax({
             method: requestType,
-            url: "method.php",
+            url: "rikki.php",
             cache: false,
             async: true,
             data: data

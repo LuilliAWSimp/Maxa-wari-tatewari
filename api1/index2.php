@@ -20,7 +20,7 @@
         document.getElementById('deleteButton').addEventListener('click', function () {
             var id_entrada = document.getElementById('id_entrada').value;
 
-            fetch('method.php?id_entrada=' + id_entrada, {
+            fetch('rikki.php?id_entrada=' + id_entrada, {
                 method: 'DELETE'
             })
             .then(function(response) {
