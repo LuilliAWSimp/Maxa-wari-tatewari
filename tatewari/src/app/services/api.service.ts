@@ -4,7 +4,7 @@ import { TopLevel } from '../interfaces';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-@Injectable() // Agrega @Injectable() aquí
+/*@Injectable() // Agrega @Injectable() aquí
 export class ApiService {
   public apiUrl = 'http://127.0.0.1:80/api1/method.php'; // Reemplaza con la URL de tu API
   constructor(private http: HttpClient) {}
@@ -21,5 +21,33 @@ export class ApiService {
 
   eliminarDato(id_user: number): Observable<{}> {
     return this.http.delete<any>(`${this.apiUrl}?id_user=${id_user}`); // Utiliza `${this.apiUrl}?id_user=${id_user}`
+  }
+}
+*/
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ApiService {
+  public apiUrl = 'http://127.0.0.1:80/api1/method.php'; // Reemplaza con la URL de tu API
+  constructor(private http: HttpClient) {}
+
+  getTopHeadlines(): Observable<TopLevel> {
+    return this.http
+      .get<TopLevel>('http://127.0.0.1:80/api1/method.php')
+      .pipe(map((resp) => resp));
+  }
+
+  // Método para enviar datos por POST
+  postDatos(datos: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, datos, {
+      responseType: 'text' as 'json',
+    });
+  }
+
+  eliminarDato(id_user: number): Observable<string> {
+    return this.http.delete<string>(`${this.apiUrl}?id_user=${id_user}`, {
+      responseType: 'text' as 'json',
+    });
   }
 }
