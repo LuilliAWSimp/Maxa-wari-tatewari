@@ -17,8 +17,7 @@ export class Tab2Page {
 
   enviarDatos() {
     // Crea un objeto con los datos a enviar al servidor
-    const datos = {
-      id_user: this.id_user,
+      const datos: TopLevel = {
       name: this.name,
       email: this.email,
       password: this.password
