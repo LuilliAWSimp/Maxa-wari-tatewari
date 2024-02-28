@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
-import { TopLevel } from 'src/app/interfaces'; // Importar la clase TopLevel desde index.ts
+import { TopLevel } from 'src/app/interfaces'; // Importa la clase TopLevel desde index.ts
 
 @Component({
   selector: 'app-tab2',
@@ -16,14 +16,15 @@ export class Tab2Page {
   constructor(private apiService: ApiService) {}
 
   enviarDatos() {
-    const datos: TopLevel = {
-      // Utilizar la clase TopLevel para definir la estructura de datos
+    // Crea un objeto con los datos a enviar al servidor
+    const datos = {
       id_user: this.id_user,
       name: this.name,
       email: this.email,
-      password: this.password,
+      password: this.password
     };
 
+    // Llama al método postDatos() del servicio ApiService para enviar los datos al servidor
     this.apiService.postDatos(datos).subscribe((resp) => {
       console.log(resp);
       // Aquí puedes manejar la respuesta del servidor como desees

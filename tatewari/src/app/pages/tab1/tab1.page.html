@@ -1,8 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Prueba users
-    </ion-title>
+    <ion-title> Prueba users </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -19,12 +17,18 @@
         <ion-card>
           <ion-card-header>
             <ion-card-title>{{ item.id_user }}</ion-card-title>
-            <ion-button (click)="item.id_user !== undefined && eliminarDato(item.id_user)" shape="round-10" fill="clear"> <ion-icon slot="icon-only"  name="trash-outline"></ion-icon></ion-button>
+            <ion-button
+              (click)="item.id_user !== undefined && eliminarDato(item.id_user)"
+              shape="round-10"
+              fill="clear"
+            >
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon
+            ></ion-button>
           </ion-card-header>
           <ion-card-content>
             <p>Id usuario {{ item.id_user }}</p>
             <p>Nombre {{ item.name }}</p>
-            <p>Email {{ item.email }}</p>            
+            <p>Email {{ item.email }}</p>
           </ion-card-content>
         </ion-card>
       </ion-col>
