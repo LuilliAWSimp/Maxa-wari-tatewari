@@ -18,11 +18,6 @@ const routes: Routes = [
     loadChildren: () =>
       import('./register/register.module').then((m) => m.RegisterPageModule),
   },
-  {
-    path: 'success-modal', // Define la ruta para el componente SuccessModelComponent
-    loadChildren: () =>
-      import('./success-modal/success-modal.module').then((m) => m.SuccessModelModule),
-  },
 ];
 @NgModule({
   imports: [
