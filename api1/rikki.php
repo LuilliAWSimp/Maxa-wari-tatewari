@@ -1,54 +1,9 @@
 <?php
 require "config/Conexion.php";
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS, DELETE");
-header("Access-Control-Allow-Headers:Content-Type");
 $datos = json_decode(file_get_contents('php://input'), true);
-//print_r($_SERVER['REQUEST_METHOD']);
+
+// users //
 switch ($_SERVER['REQUEST_METHOD']) {
-case 'OPTIONS':
-    // Habilitar CORS para cualquier origen
-header("Access-Control-Allow-Origin: *");
-
-// Permitir métodos HTTP específicos
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE, HEAD, TRACE, PATCH");
-
-// Permitir encabezados personalizados
-header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-
-// Permitir credenciales
-header("Access-Control-Allow-Credentials: true");
-   
-   if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-       // Responder a la solicitud OPTIONS sin procesar nada más
-       http_response_code(200);
-       exit;
-           break;
-   case 'HEAD':
-     if ($_SERVER['REQUEST_METHOD'] === 'HEAD') {
-       // Establecer encabezados de respuesta
-       header('Content-Type: application/json');
-       header('Custom-Header: PHP 8, HTML ');
-   
-       // Puedes establecer otros encabezados necesarios aquí
-   
-       // No es necesario enviar un cuerpo en una solicitud HEAD, por lo que no se imprime nada aquí.
-   } else {
-       http_response_code(405); // Método no permitido
-       echo 'Método de solicitud no válido';
-   }
-     break;
-   
-     case 'TRACE':
-       header("Access-Control-Allow-Origin: *");
-       if ($_SERVER['REQUEST_METHOD'] === 'TRACE') {
-         $response = "Solicitud TRACE recibida. Estado: 200 OK";
-     } else {
-         $response = "Método de solicitud no válido. Estado: 405 Método no permitido";
-     }
-     
-     echo $response;
-       break;
     case 'GET':
     // Verificar si se proporcionó el parámetro 'id_user'
     if (isset($_GET['id_user'])) {
@@ -164,39 +119,34 @@ header("Access-Control-Allow-Credentials: true");
             echo "Error al actualizar registro: " . $conexion->error;
         }
         break;
-    
-            case 'POST':
-                // Verificar si se proporcionaron todos los datos necesarios
-                if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])) {
-                    // Obtener los datos del formulario
-                    $name = $_POST['name'];
-                    $email = $_POST['email'];
-                    $password = $_POST['password'];
-            
-                    // Preparar la consulta SQL para insertar un nuevo usuario
-                    $stmt = $conexion->prepare("INSERT INTO usuario (name, email, password) VALUES (?, ?, ?)");
-            
-                    // Verificar si la preparación de la consulta fue exitosa
-                    if ($stmt === false) {
-                        echo "Error en la preparación de la consulta: " . $conexion->error;
-                        break;
-                    }
-            
-                    // Vincular los parámetros
-                    $stmt->bind_param("sss", $name, $email, $password);
-            
-                    // Ejecutar la consulta
-                    if ($stmt->execute()) {
-                        echo "Usuario insertado con éxito.";
-                    } else {
-                        echo "Error al insertar usuario: " . $stmt->error;
-                    }
-                } else {
-                    // Si falta algún dato necesario en el formulario
-                    echo "Faltan datos en el formulario.";
-                }
-                break;
-    
+       
+    case 'POST':
+        // Recibir los datos en formato JSON
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        // Verificar si se han recibido los datos esperados
+        if (isset($data['name']) && isset($data['email']) && isset($data['password'])) {
+            // Obtener los datos del arreglo JSON
+            $name = $data['name'];
+            $email = $data['email'];
+            $password = $data['password'];
+
+            // Insertar los datos en la base de datos
+            $sql = $conexion->prepare("INSERT INTO usuario (name, email, password) VALUES (?, ?, ?)");
+            $sql->bind_param("sss", $name, $email, $password);
+            if ($sql->execute()) {
+                echo "Datos insertados con éxito";
+            } else {
+                echo "Error al insertar datos: " . $sql->error;
+            }
+            $sql->close();
+        } else {
+            // Si faltan datos
+            echo "Error: Faltan datos en la solicitud.";
+        }
+        break;
+
+
     case 'DELETE':
     // Obtener el ID de usuario del arreglo $datos
     $id_user = isset($_GET['id_user']) ? $_GET['id_user'] : null;
@@ -227,5 +177,5 @@ header("Access-Control-Allow-Credentials: true");
     }
     break;
 }
-}
+
 ?>

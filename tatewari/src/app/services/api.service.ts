@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { TopLevel } from '../interfaces';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { TopLevel } from '../interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -12,13 +11,11 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   getTopHeadlines(): Observable<TopLevel> {
-    return this.http
-      .get<TopLevel>('http://127.0.0.1:80/api1/rikki.php')
-      .pipe(map((resp) => resp));
+    return this.http.get<TopLevel>(this.apiUrl);
   }
 
   // Método para enviar datos por POST
-  postDatos(datos: any): Observable<any> {
+  postDatos(datos: TopLevel): Observable<any> {
     return this.http.post<any>(this.apiUrl, datos, {
       responseType: 'text' as 'json',
     });
