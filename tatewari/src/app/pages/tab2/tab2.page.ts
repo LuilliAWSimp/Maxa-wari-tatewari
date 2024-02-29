@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NavController } from '@ionic/angular'; // Importa NavController
 import { ApiService } from 'src/app/services/api.service';
 import { HttpHeaders } from '@angular/common/http';
 import { TopLevel } from 'src/app/interfaces';
@@ -13,7 +14,7 @@ export class Tab2Page {
   email?: string;
   password?: string;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private navCtrl: NavController) {}
 
   enviarDatos() {
     const datos: TopLevel = {
@@ -22,19 +23,18 @@ export class Tab2Page {
       password: this.password,
     };
 
-    // Configura los encabezados para indicar que se está enviando JSON
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
-    // Llama al método postDatos() del servicio ApiService para enviar los datos al servidor
+
     this.apiService.postDatos(datos).subscribe(
       (resp) => {
         console.log(resp);
-        // Aquí puedes manejar la respuesta del servidor como desees
+        // Navega a la página que muestra el componente SuccessModalComponent después de un registro exitoso
+        this.navCtrl.navigateForward('/success-modal');
       },
       (error) => {
         console.error('Error al enviar los datos:', error);
-        // Aquí puedes manejar el error de manera más específica
       }
     );
   }
