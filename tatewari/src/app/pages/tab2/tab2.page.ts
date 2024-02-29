@@ -26,7 +26,6 @@ export class Tab2Page {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
-
     // Llama al método postDatos() del servicio ApiService para enviar los datos al servidor
     this.apiService.postDatos(datos).subscribe(
       (resp) => {
