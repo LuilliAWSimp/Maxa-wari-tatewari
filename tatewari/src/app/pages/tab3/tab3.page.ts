@@ -10,12 +10,17 @@ import { Router } from '@angular/router';
 export class Tab3Page {
   username: string = '';
   password: string = '';
+
+  constructor(private authService: AuthService, private router: Router) { }
   
 
-  constructor(private authService: AuthService, private router: Router) {}
+  nextpage() {
+    this.router.navigate(['/home']);
+  }
 
   login() {
-    this.authService.login({ username: this.username, password: this.password })
+    this.authService
+      .login({ username: this.username, password: this.password })
       .subscribe(
         () => {
           // Redirige a la página principal después de iniciar sesión exitosamente

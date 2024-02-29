@@ -21,6 +21,13 @@ export class ApiService {
     });
   }
 
+  // Método para enviar datos de registro por POST
+  postRegistro(datos: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/registro`, datos, {
+      responseType: 'text' as 'json',
+    });
+  }
+
   eliminarDato(id_user: number): Observable<string> {
     return this.http.delete<string>(`${this.apiUrl}?id_user=${id_user}`, {
       responseType: 'text' as 'json',
