@@ -1,8 +1,9 @@
 {
   "config": {
-    "ionic_sass": "./sass.config.js" 
-},
+    "ionic_sass": "./sass.config.js"
+  },
   "dependencies": {
-    "bootstrap": "^5.3.2"
+    "bootstrap": "^5.3.2",
+    "firebase": "^10.9.0"
   }
 }

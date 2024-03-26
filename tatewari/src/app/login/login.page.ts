@@ -1,34 +1,44 @@
-import { Component,OnInit } from '@angular/core';
-import { Router } from "@angular/router";
-import { AuthenticationService } from "../shared/authentication-service";
+import { Component, OnInit } from '@angular/core';
+import { NavController } from '@ionic/angular';
+import { Router } from '@angular/router';
+
+import {
+  Auth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut
+} from '@angular/fire/auth';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-
 export class LoginPage implements OnInit {
+  email: string = "";
+  password: string = "";
+  
+  constructor(public navCntrl: NavController, private auth: Auth, private router: Router) {}
 
-  constructor(
-    public authService: AuthenticationService,
-    public router: Router
-  ) {}
+  async login() {
+    try {
+      const user = await signInWithEmailAndPassword(
+        this.auth,
+        this.email,
+        this.password
+      );
+      console.log(user);
+      this.router.navigate(['/tabs']);
+    } catch (error) {
+      console.error("Error de inicio de sesión:", error);
+    }
+  }
 
-  ngOnInit() {}
+  gotoSignup() {
+    this.navCntrl.navigateForward('signup');
+  }
 
-  logIn(email, password) {
-    this.authService.SignIn(email.value, password.value)
-      .then((res) => {
-        if(this.authService.isEmailVerified) {
-          this.router.navigate(['dashboard']);          
-        } else {
-          window.alert('Correo no verificado')
-          return false;
-        }
-      }).catch((error) => {
-        window.alert(error.message)
-      })
+  ngOnInit() {
   }
 
 }
