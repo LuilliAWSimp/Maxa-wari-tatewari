@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TopLevel } from '../interfaces';
+import { TopLevel, User } from '../interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
   public apiUrl = 'http://127.0.0.1:80/api1/rikki.php'; // Reemplaza con la URL de tu API
+  public apiUrl_usuarios = 'http://127.0.0.1:80/api1/rikki.php'; //APi de usuarios
   constructor(private http: HttpClient) {}
 
   getTopHeadlines(): Observable<TopLevel> {
@@ -33,4 +34,14 @@ export class ApiService {
       responseType: 'text' as 'json',
     });
   }
+//Usuarios
+saveUserData(user: User): Observable<any> {
+  const httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    responseType: 'text' as 'json'
+  };
+  return this.http.post<any>(`${this.apiUrl_usuarios}`, user, {...httpOptions});
+}
+
+  
 }

@@ -14,6 +14,6 @@ export class HomePage {
   }
 
   redirectToLogin() {
-    this.router.navigate(['/tabs/tab3']);
+    this.router.navigate(['/login']);
   }
 }
