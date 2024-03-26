@@ -1,0 +1,25 @@
+<ion-content>
+  
+  <div class="cont">
+    <!--app-toolbar></app-toolbar-->
+    <ion-row class="header">
+      <div class="iconos">
+        <a class="back" href="/tabs/tab1"> <ion-icon name="arrow-back"></ion-icon> </a>
+        <a class="enviar" expand="block" href="/registro">Registro</a>
+      </div>
+      <ion-title size="large">Iniciar <br> Sesion</ion-title>
+    </ion-row>
+    <ion-row class="form" justify-content-center  (ngSubmit)="login()">
+      <ion-grid class="login" >
+        <input type="email" placeholder="Email"  name="user" [(ngModel)]='email'>
+        <input type="password" placeholder="Contraseña" name="password" [(ngModel)]='password'>
+
+        <a>¿Olvidaste tu Contraseña?</a>
+
+        <input type="submit" value="Entrar" (click)="login()">
+              
+      </ion-grid>
+    </ion-row>
+    
+  </div>
+</ion-content>
